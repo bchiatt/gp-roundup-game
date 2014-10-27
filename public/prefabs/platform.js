@@ -1,9 +1,4 @@
-'use strict';
-
-var Platform = function(){
+var Platform = (function(){
 
 
-};
-
-
-module.exports = Platform;
+})();

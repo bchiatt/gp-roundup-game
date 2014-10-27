@@ -1,8 +1,3 @@
-'use strict';
+var BaddieX = (function() {
 
-var BaddieX = function() {
-
-};
-
-
-module.exports = BaddieX;
+})();

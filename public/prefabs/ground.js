@@ -1,7 +1,3 @@
-'use strict';
+var Ground = (function() {
 
-var Ground = function() {
-
-};
-
-module.export = Ground;
+})();

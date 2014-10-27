@@ -1,9 +1,4 @@
 
-'use strict';
+var BaddieZ = (function() {
 
-var BaddieZ = function() {
-
-};
-
-
-module.exports = BaddieZ;
+})();

@@ -1,7 +1,3 @@
-'use strict';
+var Scoreboard = (function() {
 
-var Scoreboard = function() {
-
-};
-
-module.exports = Scoreboard;
+})();

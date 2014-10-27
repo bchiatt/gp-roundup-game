@@ -1,8 +1,3 @@
-'use strict';
+var Goodie = (function() {
 
-var Goodie = function() {
-
-};
-
-
-module.exports = Goodie;
+})();

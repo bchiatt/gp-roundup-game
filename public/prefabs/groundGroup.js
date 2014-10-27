@@ -1,8 +1,3 @@
-'use strict';
+var GroundGroup = (function() {
 
-var GroundGroup = function() {
-
-};
-
-module.exports = GroundGroup;
-
+})();

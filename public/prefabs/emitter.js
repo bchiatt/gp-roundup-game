@@ -1,8 +1,4 @@
-'use strict';
-
-var Emitter = function(){
+var Emitter = (function(){
 
 
-};
-
-module.exports = Emitter;
+})();
