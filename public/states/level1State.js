@@ -3,7 +3,7 @@ var Level1 = (function(){
   var o = {
     l : {},
     preload: function(){
-      game.load.image('sky', 'assets/sky.png');
+      game.load.image('sky', 'assets/gameBackground.png');
       game.load.image('ground', 'assets/platform.png');
       game.load.image('star', 'assets/star.png');
       game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
@@ -40,21 +40,9 @@ var Level1 = (function(){
       cursors = game.input.keyboard.createCursorKeys();
       game.scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
-      stars = game.add.group();
-      stars.enableBody = true;
-
-      for (var i = 0; i < 500; i++){
-        var star = stars.create(i * 4, 0, 'star');
-
-        star.body.gravity.y = 106;
-
-        star.body.bounce.y = 0.7 + Math.random() * 0.2;
-      }
     },
     update: function(){
       game.physics.arcade.collide(player, platforms);
-      game.physics.arcade.collide(stars, platforms);
-      game.physics.arcade.overlap(player, stars, o.l.collectStar, null, this);
 
       player.body.velocity.x = 0;
 
@@ -84,9 +72,9 @@ var Level1 = (function(){
   };
 
   o.l.collectStar = function(player, star){
-     star.kill();
-     o.l.score += 10;
-     game.scoreText.text = 'Score: ' + o.l.score;
+     //star.kill();
+     //o.l.score += 10;
+     //game.scoreText.text = 'Score: ' + o.l.score;
   };
 
   o.l.gameOver = function(){
