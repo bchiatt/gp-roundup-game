@@ -1,10 +1,6 @@
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(1600, 1200, Phaser.AUTO, '');
 
-function preload(){
-}
+game.state.add('menu', Menu);
+game.state.add('level1', Level1);
 
-function create(){
-}
-
-function update(){
-}
+game.state.start('menu');
