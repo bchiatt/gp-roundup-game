@@ -61,6 +61,13 @@ var Level1 = (function(){
       fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
       game.scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
+      o.l.score = 0;
+      text = game.add.text(30, 30, 'Score: ' + o.l.score, { font: '24px Arial', fill: '#ffffff', align: 'left' });
+
+      o.l.counter = 30;
+      text = game.add.text(700, 30, 'Remaining: ' + o.l.counter, { font: '24px Arial', fill: '#ffffff', align: 'left' });
+      game.time.events.add(Phaser.Timer.SECOND * 30, o.l.gameOver, this);
+      game.time.events.loop(Phaser.Timer.SECOND, o.l.updateCounter, this);
     },
     update: function(){
       game.physics.arcade.collide(player, platforms);
@@ -113,6 +120,11 @@ var Level1 = (function(){
     }
   };
 
+  o.l.updateCounter = function(){
+     o.l.counter--;
+     text.setText('Remaining: ' + o.l.counter);
+  };
+
   o.l.collectStar = function(player, star){
      //star.kill();
      //o.l.score += 10;
@@ -120,7 +132,7 @@ var Level1 = (function(){
   };
 
   o.l.gameOver = function(){
-    //game.state.restart();
+    game.state.restart();
     //o.l.song.destroy();
   };
 
