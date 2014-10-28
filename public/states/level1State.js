@@ -152,6 +152,7 @@ var Level1 = (function(){
       game.physics.arcade.collide(gremlin, platforms);
       game.physics.arcade.collide(o.l.mogwais, platforms);
       // game.physics.arcade.collide(o.l.gremlins, o.l.platforms);
+      game.physics.arcade.collide(o.l.mogwais, o.l.mogwais);
       game.physics.arcade.overlap(player, mogwai, o.l.gameOver);
       game.physics.arcade.overlap(player, o.l.mogwais, o.l.gameOver);
       game.physics.arcade.overlap(o.l.bullets, o.l.mogwais, o.l.killMogwai, null, this);
@@ -217,13 +218,14 @@ var Level1 = (function(){
   };
 
   o.l.gameOver = function(){
+    theme.destroy();
     game.state.restart();
-    //o.l.theme.destroy();
+
   };
 
   o.l.killMogwai = function(bullet, mogwai){
     o.l.mogwaiKillSound.play();
-    o.l.bullets.getFirstExists(true).kill();
+    //o.l.bullets.getFirstExists(true).kill();
     mogwai.kill();
     bullet.kill();
     o.l.score += 20;
@@ -237,10 +239,11 @@ var Level1 = (function(){
     // o.l.gremlin.start(true, 2000, null, 10);
   };
 
-  o.l.killGremlin = function(){
+  o.l.killGremlin = function(bullet, gremlin){
     o.l.gremlinKillSound.play();
-    o.l.bullets.getFirstExists(true).kill();
+    //o.l.bullets.getFirstExists(true).kill();
     gremlin.kill();
+    bullet.kill();
     o.l.score += 40;
     o.l.scoreDisplay.setText('Score: ' + o.l.score);
   };
