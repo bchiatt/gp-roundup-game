@@ -21,7 +21,7 @@ var Level1 = (function(){
       game.load.audio('shoot',    'assets/audio/water-shoot.ogg');
       game.load.audio('x-die',    'assets/audio/x-die.ogg');
       game.load.audio('z-die',    'assets/audio/z-die.ogg');
-      game.load.audio('gameover', 'assets/audio/game-over.ogg');
+      // game.load.audio('gameover', 'assets/audio/game-over.ogg');
       // game.load.audio('intro',    'assets/audio/intro.ogg');
     },
 
@@ -152,7 +152,7 @@ var Level1 = (function(){
       game.physics.arcade.collide(gremlin, platforms);
       game.physics.arcade.collide(o.l.mogwais, platforms);
       // game.physics.arcade.collide(o.l.gremlins, o.l.platforms);
-      game.physics.arcade.collide(o.l.mogwais, o.l.mogwais);
+      // game.physics.arcade.collide(o.l.mogwais, o.l.mogwais);
       game.physics.arcade.overlap(player, mogwai, o.l.gameOver);
       game.physics.arcade.overlap(player, o.l.mogwais, o.l.gameOver);
       game.physics.arcade.overlap(o.l.bullets, o.l.mogwais, o.l.killMogwai, null, this);
@@ -218,7 +218,7 @@ var Level1 = (function(){
   };
 
   o.l.gameOver = function(){
-    theme.destroy();
+    //theme.destroy();
     game.state.restart();
 
   };
