@@ -4,9 +4,10 @@ var Level1 = (function(){
     l : {},
     preload: function(){
       game.load.image('sky', 'assets/gameBackground.png');
-      game.load.image('ground', 'assets/platform.png');
-      game.load.image('star', 'assets/star.png');
-      game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+      game.load.image('ground', 'assets/ground-grey.png');
+      game.load.image('ledge', 'assets/platform-grey.png');
+      game.load.image('bullet', 'assets/diamond.png');
+      game.load.spritesheet('kirby', 'assets/kirby-walking.png', 39, 53);
     },
     create: function(){
       game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -16,28 +17,48 @@ var Level1 = (function(){
       platforms = game.add.group();
       platforms.enableBody = true;
 
-      var ground = platforms.create(0, game.world.height - 64, 'ground');
+      var ground = platforms.create(0, game.world.height - 54, 'ground');
       ground.scale.setTo(2, 2);
       ground.body.immovable = true;
 
-      var ledge = platforms.create(400, 400, 'ground');
+      var ledge = platforms.create(500, 450, 'ledge');
+      ledge.body.immovable = true;
+      ledge.scale.x = 2.5;
+
+      ledge = platforms.create(0, 320, 'ledge');
+      ledge.scale.x = 2.5;
       ledge.body.immovable = true;
 
-      ledge = platforms.create(-150, 250, 'ground');
+      ledge = platforms.create(450, 180, 'ledge');
+      ledge.scale.x = 1.3;
       ledge.body.immovable = true;
 
-      player = game.add.sprite(32, game.world.height - 150, 'dude');
+      ledge = platforms.create(750, 180, 'ledge');
+      ledge.scale.x = 1;
+      ledge.body.immovable = true;
+
+      o.l.bullets = game.add.group();
+      o.l.bullets.enableBody = true;
+      o.l.bullets.physicsBodyType = Phaser.Physics.ARCADE;
+
+      o.l.bullets.createMultiple(1, 'bullet');
+      o.l.bullets.setAll('checkWorldBounds', true);
+      o.l.bullets.setAll('outOfBoundsKill', true);
+
+      player = game.add.sprite(32, game.world.height - 150, 'kirby');
 
       game.physics.arcade.enable(player);
 
-      player.body.bounce.y = 0.4;
+      player.body.bounce.y = 0.2;
       player.body.gravity.y = 300;
       player.body.collideWorldBounds = true;
+      player.scale.setTo(1.5);
 
-      player.animations.add('left', [0, 1, 2, 3], 10, true);
-      player.animations.add('right', [5, 6, 7, 8], 10, true);
+      player.animations.add('left', [1, 2, 3, 4, 5, 6, 7], 15, true);
+      player.animations.add('right', [1, 2, 3, 4, 5, 6, 7], 15, true);
 
       cursors = game.input.keyboard.createCursorKeys();
+      fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
       game.scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
     },
@@ -47,26 +68,47 @@ var Level1 = (function(){
       player.body.velocity.x = 0;
 
       if (cursors.left.isDown){
-          player.body.velocity.x = -150;
+        o.l.direction = 'left';
 
-          player.animations.play('left');
+        player.anchor.setTo(0.5, 1);
+        player.scale.x = -1.5;
+        player.body.velocity.x = -200;
+
+        player.animations.play('left');
       }
       else if (cursors.right.isDown)
       {
-          player.body.velocity.x = 150;
+        o.l.direction = 'right';
 
-          player.animations.play('right');
+        player.anchor.setTo(0.5, 1);
+        player.scale.x = 1.5;
+        player.body.velocity.x = 200;
+
+        player.animations.play('right');
       }
       else
       {
-          player.animations.stop();
-
-          player.frame = 4;
+        player.animations.stop();
+        player.frame = 1;
       }
 
+      if (fireButton.isDown)
+        o.l.fireBullet(player);
+
       if (cursors.up.isDown && player.body.touching.down)
-      {
-          player.body.velocity.y = -350;
+        player.body.velocity.y = -350;
+    }
+  };
+
+  o.l.fireBullet = function(player){
+    var bullet = o.l.bullets.getFirstExists(false);
+    if(bullet){
+      bullet.reset(player.x, player.y - 40);
+
+      if(o.l.direction === 'right'){
+        bullet.body.velocity.x = 450;
+      }else{
+        bullet.body.velocity.x = -450;
       }
     }
   };
