@@ -3,11 +3,27 @@ var Level1 = (function(){
   var o = {
     l : {},
     preload: function(){
-      game.load.image('sky', 'assets/gameBackground.png');
-      game.load.image('ground', 'assets/platform.png');
-      game.load.image('star', 'assets/star.png');
+      game.stage.backgroundColor = '#ffffff';
+
+      // Load images
+      game.load.image('sky',        'assets/gameBackground.png');
+      game.load.image('ground',     'assets/platform.png');
+      game.load.image('star',       'assets/star.png');
       game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+
+      // Load sounds
+      game.load.audio('gameover', 'assets/game-over.ogg');
+      game.load.audio('intro',    'assets/intro.ogg');
+      game.load.audio('jump',     'assets/jump.ogg');
+      game.load.audio('jump-s',   'assets/jump-s.ogg');
+      game.load.audio('theme',    'assets/theme-music.ogg');
+      game.load.audio('water',    'assets/water-shoot.ogg');
+      game.load.audio('x-die',    'assets/x-die.ogg');
+      game.load.audio('z-die',    'assets/y-die.ogg');
+
+
     },
+
     create: function(){
       game.physics.startSystem(Phaser.Physics.ARCADE);
 
