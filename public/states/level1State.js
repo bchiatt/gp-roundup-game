@@ -1,8 +1,12 @@
 var Level1 = (function(){
 
+  var fireSound, jumpSound;
   var o = {
     l : {},
     preload: function(){
+      game.stage.backgroundColor = '#ffffff';
+
+      // Load images
       game.load.image('wall', 'assets/gameBackground.png');
       game.load.image('ground', 'assets/ground-grey.png');
       game.load.image('ledge', 'assets/platform-grey.png');
@@ -10,11 +14,28 @@ var Level1 = (function(){
       game.load.spritesheet('kirby', 'assets/kirby-walking.png', 39, 53);
       game.load.spritesheet('mogwai', 'assets/cute-walking.png', 57.67, 65);
       game.load.spritesheet('gremlin', 'assets/gremlin-walking.png', 57.625, 65);
+
+      // Load sounds
+      game.load.audio('jump',     'assets/audio/jump.ogg');
+      game.load.audio('theme',    'assets/audio/theme-music.ogg');
+      game.load.audio('shoot',    'assets/audio/water-shoot.ogg');
+      game.load.audio('x-die',    'assets/audio/x-die.ogg');
+      game.load.audio('z-die',    'assets/audio/z-die.ogg');
+      // game.load.audio('gameover', 'assets/audio/game-over.ogg');
+      // game.load.audio('intro',    'assets/audio/intro.ogg');
     },
+
     create: function(){
       game.physics.startSystem(Phaser.Physics.ARCADE);
 
       game.add.sprite(0, 0, 'wall');
+
+      // create sounds, which are called in the update function
+      o.l.jumpSound = game.add.audio('jump');
+      o.l.fireSound = game.add.audio('shoot');
+      o.l.mogwaiKillSound = game.add.audio('x-die');
+      o.l.gremlinKillSound = game.add.audio('z-die');
+      o.l.gameover = game.add.audio('gameover');
 
       // platforms //
       platforms = game.add.group();
@@ -64,9 +85,7 @@ var Level1 = (function(){
 
       // mogwai //
       mogwai = game.add.sprite(332, game.world.height - 220, 'mogwai');
-
       game.physics.arcade.enable(mogwai);
-
       mogwai.body.gravity.y = 300;
       mogwai.body.collideWorldBounds = true;
 
@@ -74,14 +93,43 @@ var Level1 = (function(){
       mogwai.animations.add('right', [1, 2, 3, 4, 5], 15, true);
       mogwai.animations.add('die', [])
 
+      // mogwais group //
+      o.l.mogwais = game.add.group();
+      o.l.mogwais.enableBody = true;
+      o.l.mogwais.physicsBodyType = Phaser.Physics.ARCADE;
+      o.l.mogwais.createMultiple(5, 'mogwai');
+      o.l.mogwais.setAll('checkWorldBounds', true);
+      o.l.mogwais.setAll('outOfBoundsKill', true);
+
+      o.l.mogwais.forEach(function(m){
+        var x = Math.floor(Math.random() * 900 - 50),
+            y = Math.floor(Math.random() * 680 - 100);
+        m.reset(x, y);
+        m.body.gravity.y = 300;
+        var tween = game.add.tween(m).to({ x: m.x + 40 }, 4000, Phaser.Easing.Linear.None)
+        .to({ x: m.x - 40 }, 4000, Phaser.Easing.Linear.None)
+        .loop()
+        .start();
+
+      });
 
       // gremlin //
       gremlin = game.add.sprite(game.world.width - 50, 40, 'gremlin');
-
       game.physics.arcade.enable(gremlin);
-
       gremlin.body.gravity.y = 300;
       gremlin.body.collideWorldBounds = true;
+
+      /* MLF NOTE: initial gremlin group setup; code is NOT complete!
+         I think we need to add a fn like 'addOnePipe' in flappybird,
+         which randomly places the gremlin on the screen on monguaiKill
+      */
+      // gremlins group //
+      o.l.gremlins = game.add.group();
+      o.l.gremlins.enableBody = true;
+      o.l.gremlins.physicsBodyType = Phaser.Physics.ARCADE;
+      o.l.gremlins.createMultiple(5, 'gremlin');
+      o.l.gremlins.setAll('checkWorldBounds', true);
+      o.l.gremlins.setAll('outOfBoundsKill', true);
 
       // controls //
       cursors = game.input.keyboard.createCursorKeys();
@@ -97,11 +145,17 @@ var Level1 = (function(){
       game.time.events.add(Phaser.Timer.SECOND * 30, o.l.gameOver, this);
       game.time.events.loop(Phaser.Timer.SECOND, o.l.updateCounter, this);
     },
+
     update: function(){
       game.physics.arcade.collide(player, platforms);
       game.physics.arcade.collide(mogwai, platforms);
       game.physics.arcade.collide(gremlin, platforms);
+      game.physics.arcade.collide(o.l.mogwais, platforms);
+      // game.physics.arcade.collide(o.l.gremlins, o.l.platforms);
+      // game.physics.arcade.collide(o.l.mogwais, o.l.mogwais);
       game.physics.arcade.overlap(player, mogwai, o.l.gameOver);
+      game.physics.arcade.overlap(player, o.l.mogwais, o.l.gameOver);
+      game.physics.arcade.overlap(o.l.bullets, o.l.mogwais, o.l.killMogwai, null, this);
       game.physics.arcade.overlap(o.l.bullets, mogwai, o.l.killMogwai, null, this);
       game.physics.arcade.overlap(o.l.bullets, gremlin, o.l.killGremlin, null, this);
 
@@ -143,6 +197,7 @@ var Level1 = (function(){
   o.l.fireBullet = function(player){
     var bullet = o.l.bullets.getFirstExists(false);
     if(bullet){
+      o.l.fireSound.play();
       bullet.reset(player.x, player.y - 20);
 
       if(o.l.direction === 'right'){
@@ -163,27 +218,39 @@ var Level1 = (function(){
   };
 
   o.l.gameOver = function(){
+    //theme.destroy();
     game.state.restart();
-    //o.l.song.destroy();
+
   };
 
-  o.l.killMogwai = function(){
-    o.l.bullets.getFirstExists(true).kill();
+  o.l.killMogwai = function(bullet, mogwai){
+    o.l.mogwaiKillSound.play();
+    //o.l.bullets.getFirstExists(true).kill();
     mogwai.kill();
+    bullet.kill();
     o.l.score += 20;
     o.l.scoreDisplay.setText('Score: ' + o.l.score);
+
+    /* INSERT CODE TO GENERATE GREMLIN; may look something like this */
+    // var x = Math.floor(Math.random() * 801 - 32),
+    //     y = Math.floor(Math.random() * 601 - 90);
+    // o.l.gremlin.x = x;
+    // o.l.gremlin.y = y;
+    // o.l.gremlin.start(true, 2000, null, 10);
   };
 
-  o.l.killGremlin = function(){
-    o.l.bullets.getFirstExists(true).kill();
+  o.l.killGremlin = function(bullet, gremlin){
+    o.l.gremlinKillSound.play();
+    //o.l.bullets.getFirstExists(true).kill();
     gremlin.kill();
+    bullet.kill();
     o.l.score += 40;
     o.l.scoreDisplay.setText('Score: ' + o.l.score);
   };
 
   o.l.jump = function(player){
+    o.l.jumpSound.play();
     player.body.velocity.y = -350;
-    //player.jumpSound.play();
   };
 
   return o;
