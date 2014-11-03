@@ -2,7 +2,6 @@ var Menu = (function(){
 
   var o = {
     l : {},
-
     preload: function(){
       game.stage.backgroundColor = '#727272';
       game.load.image('sky',         '/assets/gameBackground.png');
